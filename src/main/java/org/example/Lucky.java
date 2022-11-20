@@ -1,24 +1,21 @@
 package org.example;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
-class CommonResource{
-    int x = 0;
-}
-public class Lucky {
-    static int count = 0;
+import java.util.concurrent.atomic.AtomicInteger;
 
+public class Lucky {
+    static AtomicInteger x = new AtomicInteger(0);
+    static AtomicInteger count = new AtomicInteger(0);
+    private static final Object syncObject = new Object();
     static class LuckyThread extends Thread {
-        CommonResource res = new CommonResource();
         @Override
         public void run() {
-            synchronized (res){
-                while (res.x < 999999) {
-                    res.x++;
-                    if ((res.x % 10) + (res.x / 10) % 10 + (res.x / 100) % 10 == (res.x / 1000)
-                            % 10 + (res.x / 10000) % 10 + (res.x / 100000) % 10) {
-                        System.out.println(res.x);
-                        count++;
+            while (x.get() < 999999) {
+                int curX = x.incrementAndGet();
+                synchronized (syncObject){
+                    if ((curX % 10) + (curX / 10) % 10 + (curX / 100) % 10 == (curX / 1000)
+                            % 10 + (curX / 10000) % 10 + (curX / 100000) % 10) {
+                        System.out.println(curX);
+                        count.incrementAndGet();
                     }
                 }
             }
@@ -38,3 +35,4 @@ public class Lucky {
         System.out.println("Total: " + count);
     }
 }
+
