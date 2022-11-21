@@ -5,18 +5,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Lucky {
     static AtomicInteger x = new AtomicInteger(0);
     static AtomicInteger count = new AtomicInteger(0);
-    private static final Object syncObject = new Object();
     static class LuckyThread extends Thread {
         @Override
         public void run() {
             while (x.get() < 999999) {
                 int curX = x.incrementAndGet();
-                synchronized (syncObject){
-                    if ((curX % 10) + (curX / 10) % 10 + (curX / 100) % 10 == (curX / 1000)
-                            % 10 + (curX / 10000) % 10 + (curX / 100000) % 10) {
-                        System.out.println(curX);
-                        count.incrementAndGet();
-                    }
+                if (curX <= 999999 && ((curX % 10) + (curX / 10) % 10 + (curX / 100) % 10 == (curX / 1000)
+                        % 10 + (curX / 10000) % 10 + (curX / 100000) % 10)) {
+                    System.out.println(curX);
+                    count.incrementAndGet();
                 }
             }
         }
